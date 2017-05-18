@@ -1,2 +1,3 @@
 # trident
-trident vagrant box
+
+see https://github.com/tridentli/trident/blob/master/doc/Trident.md#quick-and-dirty
