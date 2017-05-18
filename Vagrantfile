@@ -1,7 +1,7 @@
 Vagrant.configure(2) do |config|
 
    config.vm.define 'trident-server' do |box|
-      box.vm.box = "ubu14"
+      box.vm.box = "ubuntu/xenial64"
       box.vm.hostname = 'trident-server'
       box.vm.network :private_network, ip: "192.168.33.33"
       box.vm.provider :virtualbox do |vb|
@@ -12,7 +12,7 @@ Vagrant.configure(2) do |config|
    end
 
   config.vm.define 'oauth-client' do |box|
-     box.vm.box = "ubu14"
+     box.vm.box = "ubuntu/xenial64"
      box.vm.hostname = 'oauth-client'
      box.vm.network :private_network, ip: "192.168.33.22"
      box.vm.provider :virtualbox do |vb|

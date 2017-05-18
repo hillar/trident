@@ -17,27 +17,19 @@ echo $(date) >  /vagrant/provision.log
 echo 'Acquire::ForceIPv4 "true";' >> /etc/apt/apt.conf.d/99force-ipv4
 export DEBIAN_FRONTEND=noninteractive
 
-echo "installing postgresql nginx postfix unzip"
-apt-get -y install postgresql nginx postfix >> /vagrant/provision.log 1>&2
+echo "installing postgresql nginx postfix ntpdate"
+apt-get -y install postgresql nginx postfix ntpdate >> /vagrant/provision.log 1>&2
 echo "downloading and installing Trident"
 cd /vagrant/
 [[ -f "trident-cli_${TRIDENTVER}_amd64.deb" ]]    || wget -4 -q https://github.com/tridentli/trident/releases/download/v$TRIDENTVER/trident-cli_${TRIDENTVER}_amd64.deb
 [[ -f "trident-server_${TRIDENTVER}_amd64.deb" ]] || wget -4 -q https://github.com/tridentli/trident/releases/download/v$TRIDENTVER/trident-server_${TRIDENTVER}_amd64.deb
 [[ -f "pitchfork-data_${PITCHFORKVER}_all.deb" ]] || wget -4 -q https://github.com/tridentli/trident/releases/download/v$TRIDENTVER/pitchfork-data_${PITCHFORKVER}_all.deb
 dpkg -i pitchfork-data_${PITCHFORKVER}_all.deb >> /vagrant/provision.log 1>&2
-dpkg -i trident-server_${TRIDENTVER}_amd64.deb
+dpkg -i trident-server_${TRIDENTVER}_amd64.deb >> /vagrant/provision.log 1>&2
 dpkg -i trident-cli_${TRIDENTVER}_amd64.deb >> /vagrant/provision.log 1>&2
 
-
-exit 0
-
-
-# edit /etc/trident/trident.conf
-
-
-su - postgres -c "/usr/sbin/tsetup setup_db"
-su - postgres -c "/usr/sbin/tsetup adduser trident trident"
-
+su - postgres -c "/usr/sbin/tsetup setup_db" >> /vagrant/provision.log 1>&2
+su - postgres -c "/usr/sbin/tsetup adduser trident trident" >> /vagrant/provision.log 1>&2
 
 #self signed certificate
 mkdir /etc/nginx/ssl
@@ -108,6 +100,7 @@ server {
   include /etc/trident/nginx/trident-server.inc;
 }
 EOF
+service nginx restart >> /vagrant/provision.log 1>&2
 
 echo 'trident-handler: "|/usr/sbin/trident-wrapper"' >> /etc/aliases
 
@@ -127,6 +120,10 @@ mydestination = trident-server, localhost
 virtual_maps = hash:/etc/postfix/virtual
 EOF
 
-postmap /etc/postfix/virtual
-newaliases
-service postfix reload
+postmap /etc/postfix/virtual >> /vagrant/provision.log 1>&2
+newaliases >> /vagrant/provision.log 1>&2
+service postfix reload >> /vagrant/provision.log 1>&2
+
+systemctl start trident.service
+sleep 1
+netstat -ntple
