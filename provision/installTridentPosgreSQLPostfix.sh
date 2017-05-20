@@ -102,8 +102,11 @@ server {
 EOF
 service nginx restart >> /vagrant/provision.log 1>&2
 
-echo 'trident-handler: "|/usr/sbin/trident-wrapper"' >> /etc/aliases
 
+# setting up postfix
+
+# set the handler
+echo 'trident-handler: "|/usr/sbin/trident-wrapper"' >> /etc/aliases
 cat > /etc/postfix/virtual <<EOF
 example.net                ----------------
 mail-handler@example.net   trident-handler
