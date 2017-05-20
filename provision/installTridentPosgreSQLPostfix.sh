@@ -115,11 +115,7 @@ EOF
 
 cat >> /etc/postfix/main.cf <<EOF
 # trident ..
-alias_maps = hash:/etc/aliases
-alias_database = hash:/etc/aliases
-myhostname = trident-server
 myorigin = trident-server
-mydestination = trident-server, localhost
 virtual_maps = hash:/etc/postfix/virtual
 EOF
 
