@@ -126,3 +126,39 @@ service postfix reload >> /vagrant/provision.log 1>&2
 systemctl start trident.service
 sleep 1
 netstat -ntple
+
+
+# create some groups and users
+tcli system login trident trident
+tcli system swapadmin
+# group 1
+tcli group add groupOne
+tcli group set min_invouch groupOne 1
+tcli ml new groupOne offtopic
+tcli ml new groupOne tools
+tcli ml new groupOne warroom
+# group 2
+tcli group add groupTwo
+tcli group set min_invouch groupTwo 1
+# user 1
+tcli user new userOne userone@localhost
+tcli user set name_first userOne ONE
+tcli user set name_last userOne ENO
+tcli user set affiliation userOne NONE
+tcli group nominate groupOne userOne
+tcli group nominate groupTwo userOne
+tcli ml member add groupOne  general userOne
+tcli ml member add groupTwo  general userOne
+# user 2
+tcli user new userTwo userTwo@localhost
+tcli group nominate groupTwo userTwo
+tcli ml member add groupTwo general userTwo
+# list stuff ..
+tcli user list ""
+# in group list name and description ise separated by " " but in ml by \t
+tcli group list | cut -f1 -d" " | while read g; do
+  tcli ml list $g | cut -f1  | while read ml; do
+    echo "# $g $ml"
+    tcli ml member list $g $ml
+  done
+done
